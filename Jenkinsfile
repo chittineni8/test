@@ -6,11 +6,6 @@ pipeline {
     }
     agent any
     stages {
-        stage('Cloning our Git') {
-            steps {
-                git 'https://jameelansari@bitbucket.org/jameelansari/test.git'
-            }
-        }
         stage('Building our image') {
             steps {
                 script {
