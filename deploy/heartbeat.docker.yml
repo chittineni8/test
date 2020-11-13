@@ -1,0 +1,57 @@
+heartbeat.monitors:
+- type: icmp
+  id: ping-nginx
+  name: Nginx
+  hosts: ["nginx"]
+  schedule: '*/5 * * * * * *'
+  ipv4: true
+  ipv6: true
+  mode: any
+  timeout: 16s
+  wait: 1s
+  observer.geo.name: india
+# - type: tcp
+#   id: mysql-tcp-echo
+#   name: Mysql TCP Echo
+#   hosts: ["mysql:3306"]  # default TCP Echo Protocol
+#   check: 
+#     send: "check"
+#     receive: "check"
+#   schedule: '@every 5s'
+#   ipv4: true
+#   ipv6: true
+#   mode: any
+#   observer.geo.name: india
+- type: http
+  id: service-status
+  name: Service Status
+  urls: ["http://nginx:80/health_check.php"]
+  check.response:
+    status: 200
+  schedule: '@every 5s'
+  ipv4: true
+  ipv6: true
+  mode: any
+  observer.geo.name: india
+heartbeat.scheduler:
+  limit: 10
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST}"]
+
+# ================================== Template ==================================
+setup.template.settings:
+
+#============================== Dashboards =====================================
+# setup.dashboards:
+#   enabled: true
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: "${KIBANA_HOST}"
+
+#============================== Monitoring ===============================
+monitoring:
+  enabled: true
+  elasticsearch:

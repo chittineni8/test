@@ -1,0 +1,86 @@
+#-------------------------------- Autodiscovery -------------------------------
+# Autodiscover allows you to detect changes in the system and spawn new modules as they happen.
+# metricbeat.autodiscover:
+#   providers:
+#     - type: docker
+#       # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-autodiscover-hints.html
+#       hints.enabled: true
+
+metricbeat.modules:
+#------------------------------- System Module -------------------------------
+- module: system
+  metricsets: ["cpu", "load", "memory", "network", "process", "process_summary", "core", "diskio", "socket"]
+  processes: ['.*']
+  process.include_top_n:
+    by_cpu: 5
+    by_memory: 5
+  period: 10s
+  cpu.metrics:  ["percentages"]
+  core.metrics: ["percentages"]
+
+- module: system
+  period: 1m
+  metricsets:
+    - filesystem
+    - fsstat
+  processors:
+  - drop_event.when.regexp:
+      system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+
+- module: system
+  period: 15m
+  metricsets:
+    - uptime
+
+#------------------------------- MYSQL Module -------------------------------
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(mysql:3306)/"] 
+  username: root
+  password: ${MYSQL_ROOT_PASSWORD} 
+  period: 10s
+
+#------------------------------- PHP FPM Module -------------------------------
+- module: php_fpm
+  metricsets:
+  - pool
+  - process
+  enabled: true
+  period: 10s
+  status_path: "/status"
+  hosts: ["app:9000"]
+
+#------------------------------- NGINX Module -------------------------------
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
+  hosts: ["http://nginx:80"]
+  server_status_path: "nginx_status"
+
+
+#================================ Processors ===================================
+processors:
+- add_cloud_metadata: ~
+- add_docker_metadata: ~
+- add_locale:
+    format: offset
+- add_host_metadata:
+    netinfo.enabled: true
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST}"]
+
+#============================== Dashboards =====================================
+setup.dashboards:
+  enabled: true
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: "${KIBANA_HOST}"
+
+#============================== Xpack Monitoring ===============================
+xpack.monitoring:
+  enabled: true
+  elasticsearch:

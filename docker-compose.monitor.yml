@@ -1,0 +1,84 @@
+version: '3'
+services:
+  heartbeat:
+    image: docker.elastic.co/beats/heartbeat:${ELASTICSEARCH_VERSION}
+    user: heartbeat
+    volumes: 
+     - ./deploy/heartbeat.docker.yml:/usr/share/heartbeat/heartbeat.yml:ro
+    depends_on: 
+      - elasticsearch
+      - kibana
+    environment: 
+      - ELASTICSEARCH_HOST=elasticsearch:9200
+      - KIBANA_HOST=kibana:5601 
+    networks: 
+      - default
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:${ELASTICSEARCH_VERSION}
+    user: root
+    env_file:
+      - .env
+      - .application
+    environment:
+      - ELASTICSEARCH_HOST=elasticsearch:9200
+      - KIBANA_HOST=kibana:5601
+    volumes: 
+      - ./deploy/metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
+    cap_add: ["sys_ptrace", "dac_read_search"]
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks: 
+     - default
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:${ELASTICSEARCH_VERSION}
+    depends_on:
+      - elasticsearch
+      - kibana
+    cap_add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+    cap_drop: ["ALL"]
+    ports:
+      - 8200:8200
+    networks:
+      - default
+    command: >
+       apm-server -e
+         -E apm-server.rum.enabled=true
+         -E setup.kibana.host=kibana:5601
+         -E setup.template.settings.index.number_of_replicas=0
+         -E apm-server.kibana.enabled=true
+         -E apm-server.kibana.host=kibana:5601
+         -E output.elasticsearch.hosts=["elasticsearch:9200"]
+    healthcheck:
+      interval: 10s
+      retries: 12
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+    healthcheck:
+      interval: 20s
+      retries: 10
+      test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
+    networks: 
+     - default
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+    restart: on-failure:5
+    env_file:
+      - .env
+    environment:
+      - xpack.security.enabled=false
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      - default
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
+
+networks:
+  default:
+    driver: bridge
