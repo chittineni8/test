@@ -1,4 +1,4 @@
-FROM registry.codilar.in:5000/codilar/php:7.4-fpm
+FROM codilartech/php:7.4-fpm
 LABEL author="Jameel Ahmad Ansari jameel@codilar.com"
 LABEL maintainer="Jameel Ahmad Ansari jameel@codilar.com"
 
