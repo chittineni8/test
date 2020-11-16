@@ -18,7 +18,7 @@ services:
     networks:
       - default
   app:
-    image: magento24/php7.3:${PROJECT_IMAGE}
+    image: registry.codilar.in/codilar/test:${PROJECT_IMAGE}
     build:
       context: .
       args:
