@@ -16,7 +16,7 @@ pipeline {
         stage('Deploy our image') {
             steps {
                 script {
-                    docker.withRegistry( registry, registryCredential ) {
+                    docker.withRegistry( 'https://registry.codilar.in', registryCredential ) {
                         dockerImage.push()
                     }
                 }
