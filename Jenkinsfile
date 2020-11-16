@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        registry = "https://registry.codilar.in/codilar/test"
+        registry = "registry.codilar.in/codilar/test"
         registryCredential = 'docker-registry'
         dockerImage = ''
     }
