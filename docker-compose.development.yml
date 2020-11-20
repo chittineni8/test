@@ -44,7 +44,6 @@ services:
     entrypoint: /usr/local/bin/entrypoint.sh
     depends_on:
       - mysql
-      - elasticsearch
   redis:
     image: redis:${REDIS_VERSION}
     restart: on-failure:5
