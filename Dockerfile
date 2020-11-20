@@ -58,7 +58,9 @@ RUN { \
 
 # Start script, executed upon container creation from image
 COPY ./deploy/start.sh /start.sh
+COPY ./deploy/production/start.sh /prod-start.sh
 RUN chmod +x /start.sh
+RUN chmod +x /prod-start.sh
 
 # Clean up APT and temp when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
