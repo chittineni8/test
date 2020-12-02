@@ -6,7 +6,7 @@ stages:
   - build
   - test
   - release
-  - deploy
+  # - deploy
 
 variables:
   # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
@@ -28,14 +28,14 @@ test1:
   stage: test
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker run $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpcs --standard=Magento2 app/code && ./vendor/bin/phpcbf --standard=Magento2 app/code && ./vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code
+    - docker run $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpcs --standard=Magento2 app/code && ./vendor/bin/phpcbf --standard=Magento2 app/code
 
 
 test2:
   stage: test
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker run $CONTAINER_TEST_IMAGE /script/to/run/another/test
+    - docker run $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code
 
 release-image:
   stage: release
@@ -46,10 +46,10 @@ release-image:
   only:
     - master
 
-deploy:
-  stage: deploy
-  script:
-    - ./deploy.sh
-  only:
-    - master
+# deploy:
+#   stage: deploy
+#   script:
+#     - ./deploy.sh
+#   only:
+#     - master
 
