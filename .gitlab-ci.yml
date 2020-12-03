@@ -51,3 +51,7 @@ release-image:
 #   only:
 #     - master
 
+after_script:
+  - docker rmi $CONTAINER_TEST_IMAGE
+  - docker rmi $CONTAINER_RELEASE_IMAGE
+
