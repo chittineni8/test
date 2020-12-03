@@ -25,14 +25,14 @@ test1:
   stage: test
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker run --rm $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpcs --standard=Magento2 app/code && ./vendor/bin/phpcbf --standard=Magento2 app/code
+    - docker run --rm $CONTAINER_TEST_IMAGE /bin/bash -c "composer install && ./vendor/bin/phpcs --standard=Magento2 app/code && ./vendor/bin/phpcbf --standard=Magento2 app/code"
 
 
 test2:
   stage: test
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker run --rm $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code
+    - docker run --rm $CONTAINER_TEST_IMAGE /bin/bash -c "composer install && ./vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code"
 
 release-image:
   stage: release
