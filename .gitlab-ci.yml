@@ -4,8 +4,8 @@ services:
 
 stages:
   - build
-  - test
-  - release
+  # - test
+  # - release
   # - deploy
 
 variables:
@@ -25,23 +25,24 @@ test1:
   stage: test
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker run $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpcs --standard=Magento2 app/code && ./vendor/bin/phpcbf --standard=Magento2 app/code
+    - docker run $CONTAINER_TEST_IMAGE composer install && ls -lhas
+    # - docker run $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpcs --standard=Magento2 app/code && ./vendor/bin/phpcbf --standard=Magento2 app/code
 
 
-test2:
-  stage: test
-  script:
-    - docker pull $CONTAINER_TEST_IMAGE
-    - docker run $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code
+# test2:
+#   stage: test
+#   script:
+#     - docker pull $CONTAINER_TEST_IMAGE
+#     - docker run $CONTAINER_TEST_IMAGE composer install && ./vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code
 
-release-image:
-  stage: release
-  script:
-    - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker push $CONTAINER_RELEASE_IMAGE
-  only:
-    - master
+# release-image:
+#   stage: release
+#   script:
+#     - docker pull $CONTAINER_TEST_IMAGE
+#     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+#     - docker push $CONTAINER_RELEASE_IMAGE
+#   only:
+#     - master
 
 # deploy:
 #   stage: deploy
